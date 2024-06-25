@@ -1,24 +1,20 @@
-from flask import Flask
-from flask_socketio import SocketIO, emit
+import asyncio
+import websockets
+import json
 import random
-import time
-from threading import Thread
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, cors_allowed_origins="*")
+async def send_random_data(websocket, path):
+    print(f"Client connected to {path}")
+    try:
+        while True:
+            data = {'value': random.random()}
+            await websocket.send(json.dumps(data))
+            await asyncio.sleep(5)  # Mengirim data setiap 5 detik
+    except websockets.ConnectionClosed:
+        print("Client disconnected")
 
-def send_random_data():
-    while True:
-        time.sleep(5)  # Mengirim data setiap 5 detik
-        data = {'value': random.random()}
-        socketio.emit('updateForm', data)
+start_server = websockets.serve(send_random_data, "127.0.0.2", 5002, subprotocols=["custom-path"])
 
-@app.route('/')
-def index():
-    return "WebSocket Server is running"
-
-if __name__ == '__main__':
-    thread = Thread(target=send_random_data)
-    thread.start()
-    socketio.run(app, host='0.0.0.0', port=5001, debug=True)
+asyncio.get_event_loop().run_until_complete(start_server)
+print("WebSocket server is running on ws://127.0.0.2:5002/custom-path")
+asyncio.get_event_loop().run_forever()

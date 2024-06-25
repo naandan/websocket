@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WebSocket Form Update</title>
+    <title>WebSocket with Custom Path</title>
 </head>
 <body>
     <form>
@@ -9,13 +9,21 @@
         <input type="text" id="inputField" name="inputField">
     </form>
 
-    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
-        var socket = io('http://localhost:5001'); // URL server WebSocket yang berbeda
+        var socket = new WebSocket('ws://127.0.0.2:5002/custom-path'); // Menghubungkan ke custom path
 
-        socket.on('updateForm', function(data) {
+        socket.onopen = function(event) {
+            console.log('Connected to custom path');
+        };
+
+        socket.onmessage = function(event) {
+            var data = JSON.parse(event.data);
             document.getElementById('inputField').value = data.value;
-        });
+        };
+
+        socket.onclose = function(event) {
+            console.log('Disconnected from custom path');
+        };
     </script>
 </body>
 </html>
