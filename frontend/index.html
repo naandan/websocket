@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WebSocket Form Update</title>
+    <title>WebSocket with Custom Path</title>
 </head>
 <body>
     <form>
@@ -11,7 +11,11 @@
 
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
-        var socket = io('http://localhost:5001'); // URL server WebSocket yang berbeda
+        var socket = io('http://localhost:5001/custom-path'); // Menghubungkan ke custom path
+
+        socket.on('connect', function() {
+            console.log('Connected to custom namespace');
+        });
 
         socket.on('updateForm', function(data) {
             document.getElementById('inputField').value = data.value;
