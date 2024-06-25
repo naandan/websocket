@@ -1,7 +1,11 @@
+from flask import Flask
 import asyncio
 import websockets
 import json
 import random
+from threading import Thread
+
+app = Flask(__name__)
 
 async def send_random_data(websocket, path):
     print(f"Client connected to {path}")
@@ -13,8 +17,15 @@ async def send_random_data(websocket, path):
     except websockets.ConnectionClosed:
         print("Client disconnected")
 
-start_server = websockets.serve(send_random_data, "127.0.0.2", 5002, subprotocols=["custom-path"])
+async def websocket_handler():
+    async with websockets.serve(send_random_data, "localhost", 5001):
+        await asyncio.Future()  # Run forever
 
-asyncio.get_event_loop().run_until_complete(start_server)
-print("WebSocket server is running on ws://127.0.0.2:5002/custom-path")
-asyncio.get_event_loop().run_forever()
+@app.route('/')
+def index():
+    return "Flask server is running"
+
+if __name__ == '__main__':
+    websocket_thread = Thread(target=lambda: asyncio.run(websocket_handler()))
+    websocket_thread.start()
+    app.run(host='0.0.0.0', port=5000)
