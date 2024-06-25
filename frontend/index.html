@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Form Update</title>
+</head>
+<body>
+    <form>
+        <label for="inputField">Field:</label>
+        <input type="text" id="inputField" name="inputField">
+    </form>
+
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        var socket = io('http://localhost:5001'); // URL server WebSocket yang berbeda
+
+        socket.on('updateForm', function(data) {
+            document.getElementById('inputField').value = data.value;
+        });
+    </script>
+</body>
+</html>
